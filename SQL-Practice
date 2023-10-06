@@ -1,0 +1,34 @@
+/* Examples from SQL-practice.com - All code was written by me to solve the puzzles */
+
+--Showing names of patients whose first names start and end with 'S' and are at least 6 characters long
+
+SELECT patient_id, first_name
+FROM patients
+WHERE first_name LIKE 's%s' and len(first_name) >= 6 
+
+--Subquery to create multiple counts
+
+SELECT 
+	(SELECT count(*)
+     FROM patients
+     WHERE gender = 'M') as MaleCount,
+  (SELECT COUNT(*)
+     FROM patients
+     WHERE gender = 'F') as FemaleCount
+
+--Finding Patients who were admitted for the same diagnosis more than once
+
+SELECT
+  patient_id,
+  diagnosis
+FROM admissions
+GROUP BY
+  patient_id,
+  diagnosis
+HAVING COUNT(*) > 1;
+
+--Using UNION ALL to combine tables and create new label 'Role' 
+SELECT first_name, last_name, 'Patient' AS role FROM patients
+	UNION ALL
+SELECT first_name, last_name, 'Doctor' AS role FROM doctors
+
