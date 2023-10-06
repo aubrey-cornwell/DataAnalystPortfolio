@@ -32,3 +32,11 @@ SELECT first_name, last_name, 'Patient' AS role FROM patients
 	UNION ALL
 SELECT first_name, last_name, 'Doctor' AS role FROM doctors
 
+
+--Finding Provinces where the Male Population > Female Population
+SELECT province_name
+FROM patients pa 
+	JOIN province_names pn ON pa.province_id = pn.province_id
+GROUP BY pa.province_id
+HAVING
+	COUNT( CASE WHEN gender = 'M' THEN 1 END) > COUNT( CASE WHEN gender = 'F' THEN 1 END);
