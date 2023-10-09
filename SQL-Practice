@@ -33,10 +33,22 @@ SELECT first_name, last_name, 'Patient' AS role FROM patients
 SELECT first_name, last_name, 'Doctor' AS role FROM doctors
 
 
+
 --Finding Provinces where the Male Population > Female Population
+
 SELECT province_name
 FROM patients pa 
 	JOIN province_names pn ON pa.province_id = pn.province_id
 GROUP BY pa.province_id
 HAVING
 	COUNT( CASE WHEN gender = 'M' THEN 1 END) > COUNT( CASE WHEN gender = 'F' THEN 1 END);
+
+
+--The change in Admission Totals each day compared to the day before
+SELECT 
+    admission_date, 
+    COUNT(admission_date)as TotalAdmissions,
+    (COUNT(admission_date) - LAG(COUNT(admission_date)) OVER(ORDER BY admission_date)) as ChangeOverOne
+FROM admissions
+GROUP BY admission_date
+
