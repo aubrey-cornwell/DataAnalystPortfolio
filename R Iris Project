@@ -1,0 +1,33 @@
+#STILL WORKING - SO FAR: LOOKING AT DATA
+
+#######################
+# Loading Iris data set
+########################
+
+install.packages("datasets")
+library(datasets)
+data(iris)
+
+#######################
+# Display summary stats
+########################
+
+# head() / tail()
+head(iris)
+tail(iris)
+
+# summary()
+summary(iris)
+
+# check for missing data
+sum(is.na(iris)) # no missing values
+
+# using skmir() to see a larger set of statistics
+# install.packages("skimr")
+library(skimr)
+skim(iris)
+
+# grouping data by species
+iris %>% 
+    dplyr::group_by(Species) %>% 
+    skim
