@@ -197,6 +197,8 @@ alltrips_v3 %>%
   ggplot(aes(x=weekday, y = number_of_rides, fill = member_casual)) + 
   geom_col(position = 'dodge')
 ```
+<img src="https://github.com/aubrey-cornwell/DataAnalystPortfolio/blob/main/Rides%20vs%20Usertype.jpeg?raw=true">
+
 
 Visualization of Average Duration by Rider Type
 ```{r}
@@ -208,6 +210,8 @@ alltrips_v3 %>%
   ggplot(aes(x=weekday, y=average_duration, fill=member_casual)) +
   geom_col(position="dodge")
 ```
+<img src="https://github.com/aubrey-cornwell/DataAnalystPortfolio/blob/main/Duration%20vs%20Usertype.jpeg.png?raw=true"> 
+
 
 # Finished in R Moved to Tableau
 
