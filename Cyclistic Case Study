@@ -1,0 +1,227 @@
+---
+title: "Cyclistic Case Study"
+author: "Aubrey Cornwell"
+date: "2024-03-18"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+Case Study for Google Analytics Course
+
+# Ask
+
+### Three questions looking to be answered by Cyclistic:
+1. How do annual members and casual riders use Cyclistic bikes differently?
+2. Why would casual riders buy Cyclistic annual memberships?
+3. How can Cyclistic use digital media to influence casual riders to become members?
+
+### Identify the business task
+> Analyze historical bike trip data to identify the different trends between annual members and casual riders and how each type uses Cyclistic bikes differently. 
+
+# Prepare
+
+### Checking if data ROCCC's
+The data is reliable and original - it is public data that is accurate, complete and unbiased. It is the most current full year as it is bike data from 2023 so it is the most relevant data at this point in time. Finally, this data is cited by Cylclistic and the city of Chicago. 
+
+#### Data Limitations
+The data does not give user id's, so each ride is an individual. This could potentially skew data. We are also missing a significant portion of data on which stations (and id's) users began and ended at so we will be dropping those four columns.
+
+# Process
+
+## Cleaning and Manipulating Data
+I opened the .csv files individually into Excel and created a column calculating the ride length of each user. I then calculated a second new column called day_of_week which used the WEEKDAY function to show what day the ride took place: 1 being Sunday and 7 being Saturday.
+
+# Analyze
+
+### Uploading Data
+
+Install Needed Packages
+```{r}
+library("tidyverse")  # Data import and wrangling
+library("lubridate") # Wrangle date attributes
+library("ggplot2") # Data visualizations
+```
+Uploading Each Cleaned/Transformed Dataset
+```{r}
+jan23 <- read_csv("jan23trip.csv")
+feb23 <- read_csv("feb23trip.csv")
+mar23 <- read_csv("mar23trip.csv")
+apr23 <- read_csv("apr23trip.csv")
+may23 <- read_csv("may23trip.csv")
+jun23 <- read_csv("jun23trip.csv")
+jul23 <- read_csv("jul23trip.csv")
+aug23 <- read_csv("aug23trip.csv")
+sep23 <- read_csv("sep23trip.csv")
+oct23 <- read_csv("oct23trip.csv")
+nov23 <- read_csv("nov23trip.csv")
+dec23 <- read_csv("dec23trip.csv")
+```
+
+## Wrangle data and combine into single file
+
+Seeing if all column names match up
+```{r} 
+colnames(jan23)
+colnames(feb23)
+colnames(mar23)
+colnames(apr23)
+colnames(may23)
+colnames(jun23)
+colnames(jul23)
+colnames(aug23)
+colnames(sep23)
+colnames(oct23)
+colnames(nov23)
+colnames(dec23)
+```
+
+## Inspecting data frames for variable alignment
+
+```{r}
+str(jan23)
+str(feb23)
+str(mar23)
+str(apr23)
+str(may23)
+str(jun23)
+str(jul23)
+str(aug23)
+str(sep23)
+str(oct23)
+str(nov23)
+str(dec23)
+```
+
+Combine all data sets
+```{r}
+all23_trips <- bind_rows(jan23, feb23, mar23, apr23, may23, jun23, jul23, aug23, sep23, oct23, nov23, dec23)
+```
+
+Renaming Columns for Clarity
+```{r}
+all23_trips <- rename(all23_trips
+                      ,ride_id = trip_id
+                      ,rideable_type = bikeid
+                      ,started_at = start_time
+                      ,ended_at = end_time
+                      ,member_casual = usertype)
+```
+
+Dropping the Four Columns with Too Many Null Values
+```{r}
+alltrips_v2 <- all23_trips %>%  select(-start_station_name, -start_station_id, -end_station_name, -end_station_id)
+```
+
+
+## Cleaning and Adding Data to Prepare for Analysis
+
+Inspecting New Combined Data Frame
+```{r}
+colnames(alltrips_v2) # Checking naming conventions
+nrow(alltrips_v2) # How many rows in data frame
+dim(alltrips_v2) # Data frame's dimensions
+head(alltrips_v2)
+tail(alltrips_v2)
+str(alltrips_v2)
+summary(alltrips_v2)
+unique(alltrips_v2$usertype) # Making sure there are only two answers
+```
+
+Deleting Rides Where Trip Length is less than 1 minute 
+ - may have been Divvy taking bikes out of circulation
+```{r}
+alltrips_v3 <- subset(alltrips_v2, alltrips_v2$ride_length > 000100)
+```
+
+Converting started_at and ended_at Columns to Calendar Time Format
+```{r}
+alltrips_v3$started_at <- mdy_hm(alltrips_v3$started_at)
+alltrips_v3$ended_at <- mdy_hm(alltrips_v3$ended_at)
+```
+
+Adding Date, Month, Day, and Year Columns
+```{r}
+alltrips_v3$date <- as.Date(alltrips_v3$started_at)
+alltrips_v3$month <- format(as.Date(alltrips_v3$date),"%m")
+alltrips_v3$day <- format(as.Date(alltrips_v3$date),"%d")
+alltrips_v3$year <- format(as.Date(alltrips_v3$date),"%Y")
+```
+
+Inspecting Structure of Columns
+```{r}
+str(alltrips_v3)
+```
+## Conduct Descriptive Analysis
+
+Descriptive Analysis on ride_length (all figures in seconds)
+```{r}
+mean(alltrips_v3$ride_length) # total length/rides
+median(alltrips_v3$ride_length) #midpoint ride
+max(alltrips_v3$ride_length) #longest ride
+min(alltrips_v3$ride_length) #shortest ride
+```
+
+Compare Casual Riders to Members
+```{r}
+aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual, FUN = mean)
+aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual, FUN = median)
+aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual, FUN = max)
+aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual, FUN = min)
+```
+Average Ride by time of day
+```{r}
+alltrips_v3$day_of_week <- ordered(alltrips_v3$day_of_week, levels=c("Sunday", "Monday", "Tuesday","Wednesday", "Thursday", "Friday", "Saturday")) # Days were out of order
+aggregate(alltrips_v3$ride_length~alltrips_v3$member_casual + alltrips_v3$day_of_week, FUN = mean)
+```
+
+Analyze Ridership Data by Type and Weekday
+
+```{r}
+alltrips_v3 %>% 
+  mutate(weekday =wday(started_at, label = TRUE)) %>% 
+  group_by (member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday)
+```
+
+Visualization of Number of Rides by Rider Type by Day
+
+```{r}
+alltrips_v3 %>% 
+  mutate(weekday =wday(started_at, label = TRUE)) %>% 
+  group_by (member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday) %>% 
+  ggplot(aes(x=weekday, y = number_of_rides, fill = member_casual)) + 
+  geom_col(position = 'dodge')
+```
+
+Visualization of Average Duration by Rider Type
+```{r}
+alltrips_v3 %>% 
+  mutate(weekday =wday(started_at, label = TRUE)) %>% 
+  group_by (member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday) %>% 
+  ggplot(aes(x=weekday, y=average_duration, fill=member_casual)) +
+  geom_col(position="dodge")
+```
+
+# Finished in R Moved to Tableau
+
+
+
+Data exported as a summary file to continue working
+```{r}
+counts <- aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual + alltrips_v3$day_of_week, FUN = mean)
+```
+
+# Share Portion
+
+According to the graphs made in R, and others made in Tableau linked in the portfolio, members seem to use their bikes on weekdays during morning and evening commute times. Casual members tend to take bike rides on the weekends. 
+
+My recommendation to convert casual riders into members is by marketing the benefits of biking to work. This way they will be more inclined to use the bikes besides pleasure riding. The casual riders also clearly enjoy biking long distances, see if it is more cost convenient for them to purchase a membership and ride twice weekly than pay per ride.
+
+To market to the casual riders I would choose social media as most young adults - those you could convert to riding weekdays during commute hours - will have some form of social media. The marketing team could share that having a Cyclistic membership is cost effective, more environmentally friendly than single car riding, and point out the advantages of bike sharing vs having your own bike (flexibility, 24/7 avaialability, storage).
