@@ -10,32 +10,32 @@ output:
 
 Case Study for Google Analytics Course
 
-# Ask
+#Ask
 
 ### Three questions looking to be answered by Cyclistic:
 1. How do annual members and casual riders use Cyclistic bikes differently?
 2. Why would casual riders buy Cyclistic annual memberships?
 3. How can Cyclistic use digital media to influence casual riders to become members?
 
-### Identify the business task
+###Identify the business task
 > Analyze historical bike trip data to identify the different trends between annual members and casual riders and how each type uses Cyclistic bikes differently. 
 
-# Prepare
+#Prepare
 
-### Checking if data ROCCC's
+###Checking if data ROCCC's
 The data is reliable and original - it is public data that is accurate, complete and unbiased. It is the most current full year as it is bike data from 2023 so it is the most relevant data at this point in time. Finally, this data is cited by Cylclistic and the city of Chicago. 
 
-#### Data Limitations
+####Data Limitations
 The data does not give user id's, so each ride is an individual. This could potentially skew data. We are also missing a significant portion of data on which stations (and id's) users began and ended at so we will be dropping those four columns.
 
-# Process
+#Process
 
 ## Cleaning and Manipulating Data
 I opened the .csv files individually into Excel and created a column calculating the ride length of each user. I then calculated a second new column called day_of_week which used the WEEKDAY function to show what day the ride took place: 1 being Sunday and 7 being Saturday.
 
-# Analyze
+#Analyze
 
-### Uploading Data
+###Uploading Data
 
 Install Needed Packages
 ```{r}
@@ -59,7 +59,7 @@ nov23 <- read_csv("nov23trip.csv")
 dec23 <- read_csv("dec23trip.csv")
 ```
 
-## Wrangle data and combine into single file
+##Wrangle data and combine into single file
 
 Seeing if all column names match up
 ```{r} 
@@ -77,7 +77,7 @@ colnames(nov23)
 colnames(dec23)
 ```
 
-## Inspecting data frames for variable alignment
+##Inspecting data frames for variable alignment
 
 ```{r}
 str(jan23)
@@ -115,7 +115,7 @@ alltrips_v2 <- all23_trips %>%  select(-start_station_name, -start_station_id, -
 ```
 
 
-## Cleaning and Adding Data to Prepare for Analysis
+##Cleaning and Adding Data to Prepare for Analysis
 
 Inspecting New Combined Data Frame
 ```{r}
@@ -153,7 +153,7 @@ Inspecting Structure of Columns
 ```{r}
 str(alltrips_v3)
 ```
-## Conduct Descriptive Analysis
+##Conduct Descriptive Analysis
 
 Descriptive Analysis on ride_length (all figures in seconds)
 ```{r}
@@ -213,7 +213,7 @@ alltrips_v3 %>%
 <img src="https://github.com/aubrey-cornwell/DataAnalystPortfolio/blob/main/Duration%20vs%20Usertype.jpeg.png?raw=true"> 
 
 
-# Finished in R Moved to Tableau
+#Finished in R Moved to Tableau
 
 
 
@@ -222,7 +222,7 @@ Data exported as a summary file to continue working
 counts <- aggregate(alltrips_v3$ride_length ~ alltrips_v3$member_casual + alltrips_v3$day_of_week, FUN = mean)
 ```
 
-# Share Portion
+#Share Portion
 
 According to the graphs made in R, and others made in Tableau linked in the portfolio, members seem to use their bikes on weekdays during morning and evening commute times. Casual members tend to take bike rides on the weekends. 
 
